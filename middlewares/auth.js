@@ -62,7 +62,6 @@ export const requireManager = (req, res, next) => {
       message: 'Manager access required'
     });
   }
-
   next();
 };
 
