@@ -50,8 +50,15 @@ static async getAll() {
     )
     .orderBy('u.user_id');
 
-  return rows.map(row => new Employee(row));
-}
+  return rows.map(row => {
+  // Format leave_dates nếu có
+  if (row.leave_dates) {
+    row.leave_dates = row.leave_dates.map(date =>
+      new Date(date).toISOString().split('T')[0] // lấy YYYY-MM-DD
+    );
+  }
+  return new Employee(row);
+})}
 
   static async deleteById(id) {
     await db('leave_requests').where({ user_id: id }).del();
