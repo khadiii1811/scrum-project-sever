@@ -6,7 +6,8 @@ import {
   getLeaveRequestsByUser,
   approveLeaveRequest,
   rejectLeaveRequest,
-  deleteLeaveRequest
+  deleteLeaveRequest,
+  getMyLeaveRequests
 } from '../controllers/leaveRequestController.js';
 import { authenticate, requireManager, requireEmployee } from '../middlewares/auth.js';
 
@@ -84,5 +85,12 @@ router.put('/leave-requests/:id/reject', authenticate, requireManager, rejectLea
  * @access Private (employee - own requests, manager - all requests)
  */
 router.delete('/leave-requests/:id', authenticate, deleteLeaveRequest);
+
+/**
+ * @route GET /my-leave-requests
+ * @desc Get leave requests for the current user
+ * @access Private (employee)
+ */
+router.get('/my-leave-requests', getMyLeaveRequests);
 
 export default router;

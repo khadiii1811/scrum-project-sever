@@ -1,4 +1,7 @@
 import LeaveRequest from '../models/leave-requests.js';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 /**
  * Create a new leave request
@@ -219,5 +222,32 @@ export const deleteLeaveRequest = async (req, res) => {
       success: false,
       message: error.message || 'Internal server error'
     });
+  }
+};
+
+export const getMyLeaveRequests = async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided.' });
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user_id = decoded.user_id;
+    if (!user_id) {
+      return res.status(401).json({ message: 'Invalid token.' });
+    }
+    const { status } = req.query;
+    let requests;
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      requests = await LeaveRequest.getByUser(user_id);
+      requests = requests.filter(r => r.status === status);
+    } else {
+      requests = await LeaveRequest.getByUser(user_id);
+    }
+    console.log(requests);
+    return res.json(requests.map(r => r.toJSON()));
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid or expired token.' });
   }
 };

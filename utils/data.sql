@@ -1,9 +1,9 @@
-INSERT INTO users (user_name, name, password, role) VALUES
-('nvlinh', 'Nguyễn Văn Linh', 'hashed_pwd_1', 'employee'),
-('ptnga', 'Phạm Thị Nga', 'hashed_pwd_2', 'employee'),
-('lqvinh', 'Lê Quang Vinh', 'hashed_pwd_3', 'employee'),
-('tdloan', 'Trần Diễm Loan', 'hashed_pwd_4', 'employee'),
-('ltbao', 'Lý Tuấn Bảo', 'hashed_pwd_5', 'employee');
+INSERT INTO users (username, email, name, password, role) VALUES
+('nvlinh', 'nvlinh@example.com', 'Nguyễn Văn Linh', 'hashed_pwd_1', 'employee'),
+('ptnga', 'ptnga@example.com', 'Phạm Thị Nga', 'hashed_pwd_2', 'employee'),
+('lqvinh', 'lqvinh@example.com', 'Lê Quang Vinh', 'hashed_pwd_3', 'employee'),
+('tdloan', 'tdloan@example.com', 'Trần Diễm Loan', 'hashed_pwd_4', 'employee'),
+('ltbao', 'ltbao@example.com', 'Lý Tuấn Bảo', 'hashed_pwd_5', 'employee');
 
 --
 INSERT INTO leave_balances (user_id, year, total_days, used_days, carried_over_days) VALUES

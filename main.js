@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 // Import routes
 import authRoutes from './routes/authRoutes.js';
 import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
-
+import employeeRoutes from './routes/employeeRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -28,6 +28,7 @@ app.get('/', (req, res) => {
 // Register routes
 app.use('/api', authRoutes);
 app.use('/api', leaveRequestRoutes);
+app.use('/api', employeeRoutes);
 
 // Khởi động server
 app.listen(PORT, () => {

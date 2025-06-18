@@ -13,13 +13,15 @@ class User {
    * @param {string} userData.name - Full name
    * @param {string} userData.password - Password (should be hashed)
    * @param {string} userData.role - User role ('employee' or 'manager')
+   * @param {string} userData.email - User email
    */
-  constructor({ user_id, username, name, password, role }) {
+  constructor({ user_id, username, name, password, role, email }) {
     this.user_id = user_id;
     this.username = username;
     this.name = name;
     this.password = password;
     this.role = role;
+    this.email = email;
   }
 
   /**
@@ -39,6 +41,9 @@ class User {
     }
     if (!this.role || !['employee', 'manager'].includes(this.role)) {
       throw new Error('Role must be either "employee" or "manager"');
+    }
+    if (!this.email || typeof this.email !== 'string') {
+      throw new Error('Email is required and must be a string');
     }
   }
 
@@ -113,13 +118,14 @@ class User {
         username: user.username,
         name: user.name,
         password: user.password,
-        role: user.role
+        role: user.role,
+        email: user.email
       }).returning('*');
       
       return new User(createdUser);
     } catch (error) {
-      if (error.code === '23505') { 
-        throw new Error('Username already exists');
+      if (error.code === '23505') {
+        throw new Error('Username or email already exists');
       }
       throw new Error(`Failed to create user: ${error.message}`);
     }
@@ -147,7 +153,8 @@ class User {
           username: this.username,
           name: this.name,
           password: this.password,
-          role: this.role
+          role: this.role,
+          email: this.email
         })
         .returning('*');
 
@@ -155,7 +162,7 @@ class User {
       return this;
     } catch (error) {
       if (error.code === '23505') {
-        throw new Error('Username already exists');
+        throw new Error('Username or email already exists');
       }
       throw new Error(`Failed to update user: ${error.message}`);
     }
@@ -177,7 +184,8 @@ class User {
           username: this.username,
           name: this.name,
           password: this.password,
-          role: this.role
+          role: this.role,
+          email: this.email
         }).returning('*');
         
         Object.assign(this, user);
@@ -185,7 +193,7 @@ class User {
       }
     } catch (error) {
       if (error.code === '23505') {
-        throw new Error('Username already exists');
+        throw new Error('Username or email already exists');
       }
       throw new Error(`Failed to save user: ${error.message}`);
     }
@@ -272,8 +280,13 @@ class User {
    * @returns {Object} User data without password
    */
   toJSON() {
-    const { password, ...userData } = this;
-    return userData;
+    return {
+      user_id: this.user_id,
+      username: this.username,
+      name: this.name,
+      role: this.role,
+      email: this.email
+    };
   }
 
   /**
@@ -281,7 +294,14 @@ class User {
    * @returns {Object} Complete user data
    */
   toObject() {
-    return { ...this };
+    return {
+      user_id: this.user_id,
+      username: this.username,
+      name: this.name,
+      password: this.password,
+      role: this.role,
+      email: this.email
+    };
   }
 }
 
