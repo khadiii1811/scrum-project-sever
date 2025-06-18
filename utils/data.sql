@@ -1,4 +1,4 @@
-INSERT INTO users (user_name, name, password, role) VALUES
+INSERT INTO users (username, name, password, role) VALUES
 ('nvlinh', 'Nguyễn Văn Linh', 'hashed_pwd_1', 'employee'),
 ('ptnga', 'Phạm Thị Nga', 'hashed_pwd_2', 'employee'),
 ('lqvinh', 'Lê Quang Vinh', 'hashed_pwd_3', 'employee'),
