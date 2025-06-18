@@ -28,14 +28,15 @@ export const createLeaveRequest = async (req, res) => {
       });
     }
 
-    // Validate tất cả ngày xin nghỉ phải là ngày trong tương lai
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); 
-    const invalidDate = leave_dates.find(dateStr => {
-      const date = new Date(dateStr);
-      date.setHours(0, 0, 0, 0);
-      return date <= today;
-    });
+    // Validate tất cả ngày xin nghỉ phải là ngày trong tương lai (so sánh local date)
+        const now = new Date();
+      const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // local 00:00:00
+      const invalidDate = leave_dates.find(dateStr => {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const leaveDate = new Date(year, month - 1, day); // local 00:00:00
+        console.log('todayLocal:', todayLocal, 'leaveDate:', leaveDate, 'dateStr:', dateStr);
+        return leaveDate <= todayLocal;
+      });
     if (invalidDate) {
       return res.status(400).json({
         success: false,
