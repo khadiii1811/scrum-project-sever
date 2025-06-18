@@ -27,7 +27,7 @@ export const authenticate = async (req, res, next) => {
     // Attach user to request
     req.user = {
       user_id: user.user_id,
-      user_name: user.user_name,
+      username: user.username,
       name: user.name,
       role: user.role
     };

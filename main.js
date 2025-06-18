@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 });
 
 // Register routes
-app.use('/api/auth', authRoutes);
+app.use('/api', authRoutes);
 app.use('/api', leaveRequestRoutes);
 
 // Khởi động server
