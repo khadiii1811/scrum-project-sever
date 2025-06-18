@@ -14,12 +14,18 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());          
-app.use(cookieParser());        
+app.use(cookieParser());      
 
 // Route test
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
+
+// Mock Auth (hoặc auth thực nếu có)
+import mockAuth from './middlewares/authenticate.js'; // 👈 nếu chưa có auth, dùng tạm
+app.use(mockAuth); // 👈 bỏ nếu bạn đã có middleware auth thật
+import employeeRoutes from './routes/employee.route.js';
+app.use('/employees', employeeRoutes);
 
 // Khởi động server
 app.listen(PORT, () => {

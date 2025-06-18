@@ -1,0 +1,9 @@
+### ✅ GET danh sách nhân viên
+GET http://localhost:3001/employees
+Content-Type: application/json
+
+###
+
+### ❌ DELETE nhân viên có user_id = 3
+DELETE http://localhost:3001/employees/3
+Content-Type: application/json
