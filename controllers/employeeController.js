@@ -73,3 +73,13 @@ export const deleteEmployee = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 }; 
+
+export const getAllEmployees = async (req, res) => {
+  try {
+    const employees = await User.getAllEmployees();
+    res.json(employees);
+  } catch (err) {
+    console.error('Error fetching employees:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

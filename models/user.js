@@ -62,6 +62,10 @@ class User {
     }
   }
 
+  static async getAllEmployees() {
+    return this.getAll().then(users => users.filter(user => user.role === 'employee'));
+  }
+
   /**
    * Get user by ID
    * @static
