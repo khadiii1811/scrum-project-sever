@@ -3,6 +3,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
+// Import routes
+import authRoutes from './routes/authRoutes.js';
+import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
+
 dotenv.config();
 
 const app = express();
@@ -20,6 +24,10 @@ app.use(cookieParser());
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
+
+// Register routes
+app.use('/api/auth', authRoutes);
+app.use('/api', leaveRequestRoutes);
 
 // Khởi động server
 app.listen(PORT, () => {

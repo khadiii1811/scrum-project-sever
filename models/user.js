@@ -9,14 +9,14 @@ class User {
    * Create a new User instance
    * @param {Object} userData - User data object
    * @param {number} [userData.user_id] - User ID
-   * @param {string} userData.username - Username
+   * @param {string} userData.user_name - Username
    * @param {string} userData.name - Full name
    * @param {string} userData.password - Password (should be hashed)
    * @param {string} userData.role - User role ('employee' or 'manager')
    */
-  constructor({ user_id, username, name, password, role }) {
+  constructor({ user_id, user_name, name, password, role }) {
     this.user_id = user_id;
-    this.username = username;
+    this.user_name = user_name;
     this.name = name;
     this.password = password;
     this.role = role;
@@ -28,7 +28,7 @@ class User {
    * @throws {Error} If validation fails
    */
   _validate() {
-    if (!this.username || typeof this.username !== 'string') {
+    if (!this.user_name || typeof this.user_name !== 'string') {
       throw new Error('Username is required and must be a string');
     }
     if (!this.name || typeof this.name !== 'string') {
@@ -80,17 +80,17 @@ class User {
   /**
    * Get user by username
    * @static
-   * @param {string} username - Username
+   * @param {string} user_name - Username
    * @returns {Promise<User|null>} User instance or null if not found
    * @throws {Error} If database query fails
    */
-  static async getByUsername(username) {
+  static async getByUsername(user_name) {
     try {
-      if (!username || typeof username !== 'string') {
+      if (!user_name || typeof user_name !== 'string') {
         throw new Error('Valid username is required');
       }
       
-      const data = await db('users').where({ username }).first();
+      const data = await db('users').where({ user_name }).first();
       return data ? new User(data) : null;
     } catch (error) {
       throw new Error(`Failed to get user by username: ${error.message}`);
@@ -110,7 +110,7 @@ class User {
       user._validate();
       
       const [createdUser] = await db('users').insert({
-        username: user.username,
+        user_name: user.user_name,
         name: user.name,
         password: user.password,
         role: user.role
@@ -118,7 +118,7 @@ class User {
       
       return new User(createdUser);
     } catch (error) {
-      if (error.code === '23505') { // PostgreSQL unique constraint violation
+      if (error.code === '23505') { 
         throw new Error('Username already exists');
       }
       throw new Error(`Failed to create user: ${error.message}`);
@@ -144,7 +144,7 @@ class User {
       const [updatedUser] = await db('users')
         .where({ user_id: this.user_id })
         .update({
-          username: this.username,
+          user_name: this.user_name,
           name: this.name,
           password: this.password,
           role: this.role
@@ -174,7 +174,7 @@ class User {
         return await this.update({});
       } else {
         const [user] = await db('users').insert({
-          username: this.username,
+          user_name: this.user_name,
           name: this.name,
           password: this.password,
           role: this.role
@@ -250,17 +250,17 @@ class User {
   /**
    * Check if username exists
    * @static
-   * @param {string} username - Username to check
+   * @param {string} user_name - Username to check
    * @returns {Promise<boolean>} True if exists, false otherwise
    * @throws {Error} If database query fails
    */
-  static async usernameExists(username) {
+  static async usernameExists(user_name) {
     try {
-      if (!username || typeof username !== 'string') {
+      if (!user_name || typeof user_name !== 'string') {
         throw new Error('Valid username is required');
       }
 
-      const user = await db('users').where({ username }).first();
+      const user = await db('users').where({ user_name }).first();
       return !!user;
     } catch (error) {
       throw new Error(`Failed to check username existence: ${error.message}`);
