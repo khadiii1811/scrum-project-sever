@@ -1,20 +1,40 @@
 import User from '../models/user.js';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 /**
- * Authentication middleware that gets user from database
- * In production, this should verify JWT tokens
+ * Authentication middleware that verifies JWT token and gets user from database
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next function
  */
 export const authenticate = async (req, res, next) => {
   try {
-    // For testing purposes, we'll use a simple approach
-    // In production, you would verify JWT tokens from Authorization header
-    
-    // Get user_id from query parameter or header for testing
-    const user_id = req.query.user_id || req.headers['user-id'] || 1;
-    
+    // Get token from Authorization header or query parameter
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.startsWith('Bearer ') 
+      ? authHeader.substring(7) 
+      : req.query.token || req.headers['x-access-token'];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Access token required'
+      });
+    }
+
+    // Verify and decode token
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user_id = decoded.user_id;
+
+    if (!user_id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token: missing user_id'
+      });
+    }
+
     // Get user from database
     const user = await User.getById(parseInt(user_id));
     if (!user) {
@@ -35,6 +55,18 @@ export const authenticate = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Authentication error:', error);
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token'
+      });
+    }
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired'
+      });
+    }
     res.status(401).json({
       success: false,
       message: 'Authentication failed'
@@ -62,7 +94,6 @@ export const requireManager = (req, res, next) => {
       message: 'Manager access required'
     });
   }
-
   next();
 };
 
