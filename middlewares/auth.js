@@ -9,14 +9,20 @@ import User from '../models/user.js';
  */
 export const authenticate = async (req, res, next) => {
   try {
-    // For testing purposes, we'll use a simple approach
-    // In production, you would verify JWT tokens from Authorization header
-    
     // Get user_id from query parameter or header for testing
-    const user_id = req.query.user_id || req.headers['user-id'] || 1;
-    
+    const user_id_raw = req.query.user_id || req.headers['user-id'];
+    console.log(user_id_raw)
+    const user_id = parseInt(user_id_raw, 10);
+    console.log('Received user_id:', user_id_raw, 'Parsed:', user_id);
+    if (!user_id || isNaN(user_id)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Missing or invalid user_id'
+      });
+    }
+
     // Get user from database
-    const user = await User.getById(parseInt(user_id));
+    const user = await User.getById(user_id);
     if (!user) {
       return res.status(401).json({
         success: false,
