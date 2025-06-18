@@ -125,7 +125,7 @@ class LeaveBalance {
       }
 
       const balances = await db('leave_balances')
-        .where({ user_id })
+        .where({user_id})
         .orderBy('year', 'desc');
       return balances.map(balance => new LeaveBalance(balance));
     } catch (error) {
