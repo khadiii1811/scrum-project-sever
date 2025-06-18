@@ -230,6 +230,7 @@ export const getMyLeaveRequests = async (req, res) => {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'No token provided.' });
   }
+
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -238,6 +239,11 @@ export const getMyLeaveRequests = async (req, res) => {
       return res.status(401).json({ message: 'Invalid token.' });
     }
     const { status } = req.query;
+
+    console.log("=======================");
+    console.log(status);
+
+
     let requests;
     if (status && ['pending', 'approved', 'rejected'].includes(status)) {
       requests = await LeaveRequest.getByUser(user_id);
