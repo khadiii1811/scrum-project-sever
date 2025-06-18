@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 // Import routes
 import authRoutes from './routes/authRoutes.js';
 import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
+import leaveBalanceRoutes from './routes/leaveBalanceRoutes.js';
+
 import employeeRoutes from './routes/employeeRoutes.js';
 dotenv.config();
 
@@ -28,6 +30,7 @@ app.get('/', (req, res) => {
 // Register routes
 app.use('/api', authRoutes);
 app.use('/api', leaveRequestRoutes);
+app.use('/api', leaveBalanceRoutes);
 app.use('/api', employeeRoutes);
 
 // Khởi động server

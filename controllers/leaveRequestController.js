@@ -1,4 +1,5 @@
 import LeaveRequest from '../models/leave-requests.js';
+import LeaveBalance from '../models/leave-balances.js';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
@@ -10,13 +11,60 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
  */
 export const createLeaveRequest = async (req, res) => {
   try {
-    const { user_id, reason, leave_dates } = req.body;
+    // Lấy user_id từ middleware auth (req.user)
+    const user_id = req.user.user_id;
+    const { reason, leave_dates } = req.body;
 
     // Validate required fields
-    if (!user_id || !reason || !leave_dates) {
+    if (!reason || !leave_dates) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: user_id, reason, leave_dates'
+        message: 'Missing required fields: reason, leave_dates'
+      });
+    }
+
+    // Validate leave_dates is array
+    if (!Array.isArray(leave_dates) || leave_dates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'leave_dates must be a non-empty array'
+      });
+    }
+
+    // Validate tất cả ngày xin nghỉ phải là ngày trong tương lai (so sánh local date)
+    const now = new Date();
+    const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // local 00:00:00
+    const invalidDate = leave_dates.find(dateStr => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const leaveDate = new Date(year, month - 1, day); // local 00:00:00
+      console.log('todayLocal:', todayLocal, 'leaveDate:', leaveDate, 'dateStr:', dateStr);
+      return leaveDate <= todayLocal;
+    });
+    if (invalidDate) {
+      return res.status(400).json({
+        success: false,
+        message: `The selected leave date (${invalidDate}) must be a future date.`
+      });
+    }
+
+    // Lấy năm hiện tại
+    const year = new Date(leave_dates[0]).getFullYear();
+
+    // Truy vấn leave_balances
+    const balance = await LeaveBalance.getByUserAndYear(user_id, year);
+    if (!balance) {
+      return res.status(400).json({
+        success: false,
+        message: 'No leave balance found for this year.'
+      });
+    }
+
+    // Tính remaining
+    const remaining = balance.total_days + balance.carried_over_days - balance.used_days;
+    if (leave_dates.length > remaining) {
+      return res.status(400).json({
+        success: false,
+        message: `Not enough leave quota. Remaining: ${remaining}, requested: ${leave_dates.length}`
       });
     }
 
