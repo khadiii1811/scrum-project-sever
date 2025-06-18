@@ -1,102 +1,72 @@
-import axios from 'axios';
+import axiosInstance from './platform';
 
-const API_BASE_URL = 'http://localhost:3001/api';
-
-// Tạo axios instance với cấu hình mặc định
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Hàm decode JWT token để lấy user_id
-const decodeToken = (token) => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error('Error decoding token:', error);
-    return null;
-  }
-};
-
-// Interceptor để tự động thêm user-id vào header từ token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken = decodeToken(token);
-      if (decodedToken && decodedToken.user_id) {
-        config.headers['user-id'] = decodedToken.user_id;
-      }
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-/**
- * Lấy thông tin ngày phép còn lại của nhân viên hiện tại
- * @returns {Promise<Object>} Thông tin ngày phép
- */
-export const getLeaveBalance = async () => {
-  try {
-    const response = await api.get('/leave-balance/left');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching leave balance:', error);
-    throw error;
-  }
-};
-
-/**
- * Lấy thông tin profile của nhân viên hiện tại
- * @returns {Promise<Object>} Thông tin nhân viên
- */
+// Lấy thông tin nhân viên
 export const getEmployeeProfile = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+  
+  const res = await axiosInstance.get(`/auth/profile`, {
+    headers: { 
+      'Authorization': `Bearer ${token}` 
+    }
+  });
+  return res.data;
+};
+
+// Lấy số ngày phép còn lại
+export const getLeaveBalance = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+  
+  const res = await axiosInstance.get(`/leave-balance/left`, {
+    headers: { 
+      'Authorization': `Bearer ${token}` 
+    }
+  });
+  return res.data;
+};
+
+export const createLeaveRequest = async ({ leave_dates, reason }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+  
   try {
-    const response = await api.get('/auth/profile');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching employee profile:', error);
-    throw error;
+    const res = await axiosInstance.post(
+      '/leave-requests',
+      { leave_dates, reason },
+      { 
+        headers: { 
+          'Authorization': `Bearer ${token}` 
+        } 
+      }
+    );
+    return res.data;
+  } catch (err) {
+    // Log lỗi chi tiết từ backend
+    if (err.response) {
+      console.error('Backend error:', err.response.data);
+      throw new Error(err.response.data.message || "Error submitting request");
+    }
+    throw err;
   }
 };
 
-/**
- * Lấy danh sách yêu cầu nghỉ phép của nhân viên hiện tại
- * @returns {Promise<Object>} Danh sách yêu cầu nghỉ phép
- */
 export const getLeaveRequests = async () => {
-  try {
-    const response = await api.get('/leave-requests');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching leave requests:', error);
-    throw error;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error("No authentication token found");
   }
+  
+  const res = await axiosInstance.get('/leave-requests', {
+    headers: { 
+      'Authorization': `Bearer ${token}` 
+    }
+  });
+  return res.data;
 };
-
-/**
- * Tạo yêu cầu nghỉ phép mới
- * @param {Object} requestData - Dữ liệu yêu cầu nghỉ phép
- * @returns {Promise<Object>} Kết quả tạo yêu cầu
- */
-export const createLeaveRequest = async (requestData) => {
-  try {
-    const response = await api.post('/leave-requests', requestData);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating leave request:', error);
-    throw error;
-  }
-};
-
-export default api; 

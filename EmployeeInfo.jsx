@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, Link } from 'react-router-dom';
-import { getLeaveBalance, getEmployeeProfile } from "../../axios/employee";
+import { getEmployeeProfile,getLeaveBalance } from "../../axios/employee";
 
 export default function EmployeeInfo() {
   const [employee, setEmployee] = useState({});
@@ -8,46 +8,8 @@ export default function EmployeeInfo() {
   const [remainingDays, setRemainingDays] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userId, setUserId] = useState(null);
-
-  // Hàm decode JWT token để lấy user_id
-  const decodeToken = (token) => {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      return JSON.parse(jsonPayload);
-    } catch (error) {
-      console.error('Error decoding token:', error);
-      return null;
-    }
-  };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      setError("No authentication token found");
-      setLoading(false);
-      return;
-    }
-
-    // Decode token để lấy user_id
-    const decodedToken = decodeToken(token);
-    if (!decodedToken || !decodedToken.user_id) {
-      setError("Invalid token or missing user_id");
-      setLoading(false);
-      return;
-    }
-
-    setUserId(decodedToken.user_id);
-  }, []);
-
-  useEffect(() => {
-    if (!userId) return;
-
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -67,14 +29,22 @@ export default function EmployeeInfo() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError("Failed to load employee data");
+        setError(error.message || "Failed to load employee data");
       } finally {
         setLoading(false);
       }
     };
 
+    // Kiểm tra token có tồn tại không
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("No authentication token found. Please login first.");
+      setLoading(false);
+      return;
+    }
+
     fetchData();
-  }, [userId]);
+  }, []);
 
   if (loading) {
     return (
