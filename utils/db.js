@@ -5,8 +5,8 @@ const db = knex({
   connection: {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'khoa261204',
-    database: process.env.DB_NAME || 'leave_management',
+    password: process.env.DB_PASSWORD || '123456',
+    database: process.env.DB_NAME || 'scrum_test',
     port: process.env.DB_PORT || 5432
   },
   pool: { min: 0, max: 10 }
