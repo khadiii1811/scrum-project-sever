@@ -454,6 +454,10 @@ class LeaveBalance {
   isExhausted() {
     return this.getRemainingDays() <= 0;
   }
+
+  static async deleteByUserId(user_id) {
+    return db('leave_balances').where({ user_id }).del();
+  }
 }
 
 export default LeaveBalance;
