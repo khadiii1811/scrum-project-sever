@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import cron from 'node-cron';
+import { carryOverLeaveDays } from './jobs/carryOverLeave.js';
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
@@ -34,6 +36,12 @@ app.use('/api', leaveRequestRoutes);
 app.use('/api', leaveBalanceRoutes);
 app.use('/api', employeeRoutes);
 app.use('/api/manager', managerRoutes);
+
+// Cron job: chạy mỗi phút để test thực tế
+cron.schedule('* * * * *', async () => {
+  await carryOverLeaveDays();
+  console.log('Cron job: Carry over leave days executed!');
+});
 
 // Khởi động server
 app.listen(PORT, () => {

@@ -302,12 +302,19 @@ class LeaveRequest {
         throw new Error('Valid rejection reason is required');
       }
 
+      // Lấy ngày hiện tại (UTC, chỉ lấy phần ngày)
+      const today = new Date();
+      const yyyy = today.getUTCFullYear();
+      const mm = String(today.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(today.getUTCDate()).padStart(2, '0');
+      const rejectDay = `${yyyy}-${mm}-${dd}`;
+
       const [updated] = await db('leave_requests')
         .where({ id: this.id })
         .update({ 
           status: 'rejected', 
           reject_reason: reason,
-          approved_days: [] // Clear approved days when rejecting
+          approved_days: [rejectDay] // Lưu ngày reject vào approved_days
         })
         .returning('*');
 

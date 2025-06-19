@@ -67,4 +67,46 @@ export const approveLeaveRequest = async (req, res) => {
       message: error.message || 'Internal server error'
     });
   }
+};
+
+/**
+ * Reject leave request
+ * @route PUT /manager/leave-requests/:id/reject
+ * @access Private (manager)
+ */
+export const rejectLeaveRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    console.log(reason);
+    if (!reason) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rejection reason is required'
+      });
+    }
+
+    const LeaveRequest = (await import('../models/leave-requests.js')).default;
+    const leaveRequest = await LeaveRequest.getById(parseInt(id));
+    if (!leaveRequest) {
+      return res.status(404).json({
+        success: false,
+        message: 'Leave request not found'
+      });
+    }
+
+    await leaveRequest.reject(reason);
+
+    res.status(200).json({
+      success: true,
+      message: 'Leave request rejected successfully',
+      data: leaveRequest.toJSON()
+    });
+  } catch (error) {
+    console.error('Error rejecting leave request:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Internal server error'
+    });
+  }
 }; 
