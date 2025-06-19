@@ -280,8 +280,8 @@ export default function ListRequest() {
               </ul>
             </div>
 
-            {/* Approved Date (only show if approved) */}
-            {selectedEmployee.status === "approved" && selectedEmployee.approvedDate && (
+            {/* RESPONSE DATE (show for both approved and rejected) */}
+            {(selectedEmployee.status === "approved" || selectedEmployee.status === "rejected") && selectedEmployee.approvedDate && (
               <div className="bg-green-50 p-4 rounded-xl shadow-sm font-semibold">
                 <div className="flex items-center gap-2 text-green-700">
                   <BadgeCheck size={18} />
@@ -327,8 +327,7 @@ export default function ListRequest() {
                 <FileText size={18} />
                 <span>REJECT REASON</span>
               </div>
-              {/* <p className="text-sm text-gray-700 mt-1 ml-6">{selectedEmployee.rejectReason}</p> */}
-              <p className="text-sm text-gray-700 mt-1 ml-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, non laboriosam delectus officiis dolorum earum quaerat asperiores cupiditate laudantium enim numquam architecto inventore obcaecati voluptatum nostrum? Soluta, voluptas! Exercitationem, repellendus!</p>
+              <p className="text-sm text-gray-700 mt-1 ml-6">{selectedEmployee.reject_reason}</p>
             </div>
           )}
            <RejectModal

@@ -78,7 +78,7 @@ export const rejectLeaveRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
-
+    console.log(reason);
     if (!reason) {
       return res.status(400).json({
         success: false,
