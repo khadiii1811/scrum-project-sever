@@ -38,4 +38,47 @@ export const getAllEmployeesLeaveRequests = async (req, res) => {
       message: error.message || 'Internal server error'
     });
   }
-}; 
+};
+
+export const rejectLeaveRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    if (!reason || reason.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Rejection reason is required',
+      });
+    }
+
+    const leaveRequest = await LeaveRequest.getById(parseInt(id));
+    if (!leaveRequest) {
+      return res.status(404).json({
+        success: false,
+        message: 'Leave request not found',
+      });
+    }
+
+    if (leaveRequest.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Leave request is not pending',
+      });
+    }
+
+    await leaveRequest.reject(reason);
+
+    res.status(200).json({
+      success: true,
+      message: 'Leave request rejected successfully',
+      data: leaveRequest.toJSON(),
+    });
+  } catch (error) {
+    console.error('Error rejecting leave request:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Internal server error',
+    });
+  }
+};

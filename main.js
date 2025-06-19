@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
 import leaveBalanceRoutes from './routes/leaveBalanceRoutes.js';
+import managerRoutes from './routes/managerRoutes.js';
 
 import employeeRoutes from './routes/employeeRoutes.js';
 dotenv.config();
@@ -32,6 +33,7 @@ app.use('/api', authRoutes);
 app.use('/api', leaveRequestRoutes);
 app.use('/api', leaveBalanceRoutes);
 app.use('/api', employeeRoutes);
+app.use('/api/manager', managerRoutes);
 
 // Khởi động server
 app.listen(PORT, () => {
