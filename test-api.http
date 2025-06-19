@@ -1,9 +1,28 @@
-### ✅ GET danh sách nhân viên
-GET http://localhost:3001/employees
+### Login as manager
+POST http://localhost:3001/auth/login
 Content-Type: application/json
 
-###
+{
+  "username": "manager_user",
+  "password": "123456"
+}
 
-### ❌ DELETE nhân viên có user_id = 3
-DELETE http://localhost:3001/employees/3
+> {% client.global.set("token", response.body.token); %}
+
+### Approve request
+PUT http://localhost:3001/leave-requests/2/approve
+Authorization: Bearer {{token}}
 Content-Type: application/json
+
+{
+  "approved_days": ["2025-08-01"]
+}
+
+### Reject request
+PUT http://localhost:3001/leave-requests/3/reject
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "reason": "Thiếu minh chứng cụ thể"
+}

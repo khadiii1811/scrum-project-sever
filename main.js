@@ -3,6 +3,12 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
+// Import routes
+import authRoutes from './routes/authRoutes.js';
+import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
+import leaveBalanceRoutes from './routes/leaveBalanceRoutes.js';
+
+import employeeRoutes from './routes/employeeRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -21,11 +27,11 @@ app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
-// Mock Auth (hoặc auth thực nếu có)
-import mockAuth from './middlewares/authenticate.js'; // 👈 nếu chưa có auth, dùng tạm
-app.use(mockAuth); // 👈 bỏ nếu bạn đã có middleware auth thật
-import employeeRoutes from './routes/employee.route.js';
-app.use('/employees', employeeRoutes);
+// Register routes
+app.use('/api', authRoutes);
+app.use('/api', leaveRequestRoutes);
+app.use('/api', leaveBalanceRoutes);
+app.use('/api', employeeRoutes);
 
 // Khởi động server
 app.listen(PORT, () => {

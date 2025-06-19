@@ -413,6 +413,33 @@ class LeaveRequest {
   isRejected() {
     return this.status === 'rejected';
   }
+
+  /**
+   * Delete leave requests by user ID
+   * @static
+   * @param {number} user_id - User ID
+   * @returns {Promise<boolean>} True if deleted, false if not found
+   * @throws {Error} If database operation fails
+   */
+  static async deleteByUserId(user_id) {
+    return db('leave_requests').where({ user_id }).del();
+  }
+
+  async incrementUsedDays(days) {
+    if (!this.id || typeof days !== 'number') {
+      throw new Error('Invalid input for incrementing used days');
+    }
+
+    const updated = await db('leave_balances')
+      .where({ id: this.id })
+      .update({
+        used_days: this.used_days + days
+      })
+      .returning('*');
+
+    Object.assign(this, updated[0]);
+    return this;
+  }
 }
 
 export default LeaveRequest;
