@@ -62,8 +62,8 @@ EMAIL_USER="skill0sp1@gmail.com"
 EMAIL_PASS="vdng mzmp hliv qwyq"
 ```
 ### 4. Set up the database
-- Create a PostgreSQL database
-- Run database.sql and data.sql to set up tables and sample data
+- Create a PostgreSQL database.
+- Run database.sql and data.sql to set up tables and sample data.
 
 ### 5. Start the server
 ```bash
@@ -73,23 +73,23 @@ Server will run at: http://localhost:3001
 ---
 ## 📌 Features
 ### ✅ Authentication & Role
-- JWT-based login system
-- Role-based access for employee and manager
+- JWT-based login system.
+- Role-based access for employee and manager.
 
 ### 👨‍💼 Employee Features
-- View personal info & leave balance
-- Request new leave (calendar + reason)
-- View leave request history
+- View personal info & leave balance.
+- Request new leave (calendar + reason).
+- View leave request history.
 
 ### 🧑‍💼 Manager Features
-- View all leave requests
-- Approve / Reject requests with confirmation and reason
-- View employee list & remaining leave days
-- Add / Delete employees
+- View all leave requests.
+- Approve / Reject requests with confirmation and reason (if rejected).
+- View employee list & remaining leave days.
+- Add / Delete employees.
 
 ### 🔄 Year-End Leave Accumulation
-- Cron job runs every Jan 1
-- Automatically carries over unused leave days to the new year
+- Cron job runs every Jan 1.
+- Automatically carries over unused leave days to the new year.
 ---
 ## 📮 API Endpoints (Examples)
 | Method | Endpoint                             | Description                            |
