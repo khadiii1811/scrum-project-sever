@@ -29,12 +29,10 @@ The system helps employees manage their leave days and allows managers to review
 scrum-project-sever/
 │
 ├── controllers/        # Handle business logic
+├── middlewares/        # Auth middleware
 ├── models/             # DB models
 ├── routes/             # Express route definitions
 ├── utils/              # DB connection, helpers
-├── middlewares/        # Auth middleware
-├── database.sql        # DB schema
-├── data.sql            # Sample data
 ├── main.js             # Entry point
 └── .env                # Environment variables
 ```
