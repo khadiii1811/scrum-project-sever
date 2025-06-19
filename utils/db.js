@@ -7,7 +7,8 @@ const db = knex({
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'khoa261204',
     database: process.env.DB_NAME || 'leave_management',
-    port: process.env.DB_PORT || 5432
+    port: process.env.DB_PORT || 5432,
+    ssl: { rejectUnauthorized: false }
   },
   pool: { min: 0, max: 10 }
 });
