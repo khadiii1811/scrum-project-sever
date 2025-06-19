@@ -11,7 +11,14 @@ INSERT INTO leave_balances (user_id, year, total_days, used_days, carried_over_d
 (2, 2025, 12, 10, 0),  -- Nga chưa nghỉ
 (3, 2025, 12, 4, 2),  -- Vinh nghỉ 5 ngày, còn dư 2
 (4, 2025, 12, 7, 0),  -- Loan nghỉ 1 ngày
-(5, 2025, 12, 2, 0);  -- Bảo nghỉ khá nhiều
+(5, 2025, 12, 2, 0),  -- Bảo nghỉ khá nhiều
+(1, 2024, 12, 7, 2),  -- Linh đã nghỉ 3 ngày, cộng dồn 1 ngày từ 2024
+(2, 2024, 12, 10, 2),  -- Nga chưa nghỉ
+(3, 2024, 12, 4, 2),  -- Vinh nghỉ 5 ngày, còn dư 2
+(4, 2024, 12, 7, 2),  -- Loan nghỉ 1 ngày
+(5, 2024, 12, 2, 2);  -- Bảo nghỉ khá nhiều
+
+
 --
 INSERT INTO leave_requests (user_id, reason, leave_dates, approved_days, status) VALUES
 -- Nguyễn Văn Linh (user_id = 1)
@@ -52,4 +59,5 @@ INSERT INTO leave_requests (user_id, reason, leave_dates, approved_days, status)
 
 -- Lý Tuấn Bảo (user_id = 5)
 (5, 'Nghỉ phép năm', ARRAY['2025-07-15', '2025-07-16']::DATE[], ARRAY['2025-07-15']::DATE[], 'approved'),
-(5, 'Nghỉ chăm con', ARRAY['2025-08-12']::DATE[], NULL, 'pending');
+(5, 'Nghỉ chăm con', ARRAY['2025-08-12']::DATE[], NULL, 'pending'),
+(5, 'Nghỉ chăm bà', ARRAY['2025-08-20']::DATE[], NULL, 'pending');
