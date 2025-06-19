@@ -169,40 +169,6 @@ export const getLeaveRequestsByUser = async (req, res) => {
 };
 
 /**
- * Approve leave request
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
-export const approveLeaveRequest = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { approved_days } = req.body;
-
-    const leaveRequest = await LeaveRequest.getById(parseInt(id));
-    if (!leaveRequest) {
-      return res.status(404).json({
-        success: false,
-        message: 'Leave request not found'
-      });
-    }
-
-    await leaveRequest.approve(approved_days);
-
-    res.status(200).json({
-      success: true,
-      message: 'Leave request approved successfully',
-      data: leaveRequest.toJSON()
-    });
-  } catch (error) {
-    console.error('Error approving leave request:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Internal server error'
-    });
-  }
-};
-
-/**
  * Reject leave request
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
