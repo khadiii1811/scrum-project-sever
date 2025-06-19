@@ -1,4 +1,5 @@
 import db from '../utils/db.js';
+import LeaveBalance from './leave-balances.js';
 
 /**
  * LeaveRequest model class for managing leave request data
@@ -281,6 +282,17 @@ class LeaveRequest {
         .returning('*');
 
       Object.assign(this, updated);
+
+      // Cập nhật used_days cho leave_balance
+      if (this.leave_dates && this.leave_dates.length > 0) {
+        const year = new Date(this.leave_dates[0]).getFullYear();
+        const balance = await LeaveBalance.getByUserAndYear(this.user_id, year);
+        if (balance) {
+          balance.used_days += this.leave_dates.length;
+          await balance.save();
+        }
+      }
+
       return this;
     } catch (error) {
       throw new Error(`Failed to approve leave request: ${error.message}`);

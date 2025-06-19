@@ -48,6 +48,16 @@ export const addEmployee = async (req, res) => {
     });
 
     const { password, ...userData } = newUser;
+
+    // Tạo leave-balance cho user mới
+    const year = new Date().getFullYear();
+    await LeaveBalance.create({
+      user_id: newUser.user_id,
+      year,
+      total_days: 12,
+      used_days: 0,
+      carried_over_days: 0
+    });
     return res.status(201).json(userData);
   } catch (error) {
     return res.status(500).json({ message: error.message });
