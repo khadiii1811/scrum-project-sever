@@ -1,4 +1,5 @@
 import db from '../utils/db.js';
+import LeaveBalance from './leave-balances.js';
 
 /**
  * User model class for managing user data
@@ -62,8 +63,25 @@ class User {
     }
   }
 
-  static async getAllEmployees() {
-    return this.getAll().then(users => users.filter(user => user.role === 'employee'));
+  static async getAllEmployeesWithRemandingDays() {
+    const users = await this.getAll();
+    const employees = users.filter(user => user.role === 'employee');
+    const currentYear = new Date().getFullYear();
+    // Lấy remandingdays cho từng employee
+    const employeesWithRemandingDays = await Promise.all(
+      employees.map(async (user) => {
+        const balance = await LeaveBalance.getByUserAndYear(user.user_id, currentYear);
+        let remandingdays = null;
+        if (balance) {
+          remandingdays = 12 - (balance.used_days || 0) + (balance.carried_over_days || 0);
+        }
+        return {
+          ...user.toJSON(),
+          remandingdays
+        };
+      })
+    );
+    return employeesWithRemandingDays;
   }
 
   /**

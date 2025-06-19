@@ -76,7 +76,7 @@ export const deleteEmployee = async (req, res) => {
 
 export const getAllEmployees = async (req, res) => {
   try {
-    const employees = await User.getAllEmployees();
+    const employees = await User.getAllEmployeesWithRemandingDays();
     res.json(employees);
   } catch (err) {
     console.error('Error fetching employees:', err);
