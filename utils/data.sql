@@ -1,9 +1,9 @@
 INSERT INTO users (username, email, name, password, role) VALUES
-('nvlinh', 'nvlinh@example.com', 'Nguyễn Văn Linh', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee'),
-('ptnga', 'ptnga@example.com', 'Phạm Thị Nga', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee'),
-('lqvinh', 'lqvinh@example.com', 'Lê Quang Vinh', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee'),
-('tdloan', 'tdloan@example.com', 'Trần Diễm Loan', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee'),
-('ltbao', 'ltbao@example.com', 'Lý Tuấn Bảo', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee');
+('nvlinh', 'nvlinh@gmail.com', 'Nguyễn Văn Linh', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'manager'),
+('ptnga', 'ptnga@gmail.com', 'Phạm Thị Nga', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee'),
+('lqvinh', 'lqvinh@gmail.com', 'Lê Quang Vinh', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee'),
+('tdloan', 'tdloan@gmail.com', 'Trần Diễm Loan', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee'),
+('ltbao', 'ltbao@gmail.com', 'Lý Tuấn Bảo', '$2a$12$d.b2KZ6bsFwPid.hxw6G3OPZN99NWZt4eKg6freyGkrPXgeNOXhJa', 'employee');
 
 --
 INSERT INTO leave_balances (user_id, year, total_days, used_days, carried_over_days) VALUES
