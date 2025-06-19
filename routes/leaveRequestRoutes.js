@@ -4,11 +4,9 @@ import {
   getAllLeaveRequests, 
   getLeaveRequestById, 
   getLeaveRequestsByUser,
-  rejectLeaveRequest,
   deleteLeaveRequest,
   getMyLeaveRequests
 } from '../controllers/leaveRequestController.js';
-import { getAllEmployeesLeaveRequests } from '../controllers/managerController.js';
 import { authenticate, requireManager, requireEmployee } from '../middlewares/auth.js';
 
 const router = express.Router();
@@ -64,13 +62,6 @@ router.get('/leave-requests/user/:user_id', authenticate, getLeaveRequestsByUser
  * @access Private (employee)
  */
 router.post('/leave-requests', authenticate, requireEmployee, createLeaveRequest);
-
-/**
- * @route PUT /leave-requests/:id/reject
- * @desc Reject leave request
- * @access Private (manager)
- */
-router.put('/leave-requests/:id/reject', authenticate, requireManager, rejectLeaveRequest);
 
 /**
  * @route DELETE /leave-requests/:id

@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { CalendarDays, FileText, Clock, BadgeCheck } from "lucide-react";
 import RejectModal from "../../components/RejectModal";
 import ConfirmModal from "../../components/ConfirmModal";
-import { getAllEmployeesLeaveRequests, approveLeaveRequest } from "../../axios/manager";
+import { getAllEmployeesLeaveRequests, approveLeaveRequest, rejectLeaveRequest } from "../../axios/manager";
 
 export default function ListRequest() {
   const [employees, setEmployees] = useState([]);
@@ -77,14 +77,41 @@ export default function ListRequest() {
 
   
 
-    const confirmReject = (reason) => {
-        // Gửi request với lý do từ modal
-        // console.log("Rejected ID:", selectedRequestId);
-        // console.log("Reason:", reason);
-        toast.error("Rejected");
-        setSelectedEmployee(null);
-
-        // TODO: Gọi API backend tại đây
+    const confirmReject = async (reason) => {
+        if (!selectedEmployee) return;
+        try {
+            await rejectLeaveRequest(selectedEmployee.id, reason);
+            toast.success("Rejected");
+            // Reload lại danh sách
+            getAllEmployeesLeaveRequests()
+                .then((res) => {
+                    const employees = res.data.map((item) => ({
+                        id: item.id,
+                        name: item.user?.name || "N/A",
+                        email: item.user?.email || "",
+                        status: item.status,
+                        avatar: item.user?.avatar || "https://i.pravatar.cc/150?img=1",
+                        leaveDays: item.leave_dates,
+                        reason: item.reason,
+                        requestDate: item.created_at ? item.created_at.slice(0, 10) : "",
+                        approvedDate: item.approved_days && item.approved_days.length > 0 ? item.approved_days[0] : undefined,
+                    }));
+                    // Sort theo created_at giảm dần (mới nhất lên đầu)
+                    employees.sort((a, b) => {
+                        if (!a.requestDate) return 1;
+                        if (!b.requestDate) return -1;
+                        return b.requestDate.localeCompare(a.requestDate);
+                    });
+                    setEmployees(employees);
+                    setSelectedEmployee(null);
+                })
+                .catch(() => {
+                    toast.error("Không thể tải lại danh sách sau khi reject");
+                });
+            setShowRejectModal(false);
+        } catch (err) {
+            toast.error("Reject failed");
+        }
     };
 
   const handleFilterClick = (status) => {
@@ -278,7 +305,10 @@ export default function ListRequest() {
           {selectedEmployee.status === "pending" && (
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => handleRejectClick(456)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRejectClick(456, "Rejected");
+                }}
                 className="bg-red-100 text-red-700 px-4 py-1.5 rounded-md text-sm font-medium hover:bg-red-200"
               >
                 Reject
