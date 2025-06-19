@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes.js';
 import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
 import leaveBalanceRoutes from './routes/leaveBalanceRoutes.js';
 
+import employeeRoutes from './routes/employeeRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -30,6 +31,7 @@ app.get('/', (req, res) => {
 app.use('/api', authRoutes);
 app.use('/api', leaveRequestRoutes);
 app.use('/api', leaveBalanceRoutes);
+app.use('/api', employeeRoutes);
 
 // Khởi động server
 app.listen(PORT, () => {
