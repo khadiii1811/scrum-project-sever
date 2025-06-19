@@ -29,6 +29,13 @@ export default function ListRequest() {
           requestDate: item.created_at ? item.created_at.slice(0, 10) : "",
           approvedDate: item.approved_days && item.approved_days.length > 0 ? item.approved_days[0] : undefined,
         }));
+        // Sort theo created_at giảm dần (mới nhất lên đầu)
+        employees.sort((a, b) => {
+          // Nếu không có created_at thì để xuống cuối
+          if (!a.requestDate) return 1;
+          if (!b.requestDate) return -1;
+          return b.requestDate.localeCompare(a.requestDate);
+        });
         setEmployees(employees);
       })
       .catch((err) => {
@@ -106,6 +113,13 @@ export default function ListRequest() {
             requestDate: item.created_at ? item.created_at.slice(0, 10) : "",
             approvedDate: item.approved_days && item.approved_days.length > 0 ? item.approved_days[0] : undefined,
           }));
+          // Sort theo created_at giảm dần (mới nhất lên đầu)
+          employees.sort((a, b) => {
+            // Nếu không có created_at thì để xuống cuối
+            if (!a.requestDate) return 1;
+            if (!b.requestDate) return -1;
+            return b.requestDate.localeCompare(a.requestDate);
+          });
           setEmployees(employees);
           setSelectedEmployee(null);
         })
