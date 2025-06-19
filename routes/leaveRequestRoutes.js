@@ -8,6 +8,7 @@ import {
   rejectLeaveRequest,
   deleteLeaveRequest
 } from '../controllers/leaveRequestController.js';
+import { getAllEmployeesLeaveRequests } from '../controllers/managerController.js';
 import { authenticate, requireManager, requireEmployee } from '../middlewares/auth.js';
 
 const router = express.Router();
