@@ -169,69 +169,6 @@ export const getLeaveRequestsByUser = async (req, res) => {
 };
 
 /**
- * Approve leave request
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
-export const approveLeaveRequest = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { approved_days } = req.body;
-
-    // Kiểm tra input
-    if (!approved_days || !Array.isArray(approved_days) || approved_days.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'approved_days must be a non-empty array'
-      });
-    }
-
-    // Lấy leave request
-    const leaveRequest = await LeaveRequest.getById(parseInt(id));
-    if (!leaveRequest) {
-      return res.status(404).json({ success: false, message: 'Leave request not found' });
-    }
-
-    // Kiểm tra trạng thái đã được xử lý chưa
-    if (leaveRequest.status !== 'pending') {
-      return res.status(400).json({ success: false, message: 'Leave request is not pending' });
-    }
-
-    // Kiểm tra approved_days phải nằm trong leave_dates
-    const invalidDay = approved_days.find(day => !leaveRequest.leave_dates.includes(day));
-    if (invalidDay) {
-      return res.status(400).json({
-        success: false,
-        message: `Approved day "${invalidDay}" is not in the original leave_dates`
-      });
-    }
-
-    // Approve đơn
-    await leaveRequest.approve(approved_days);
-
-    // Cập nhật used_days
-    const year = new Date(approved_days[0]).getFullYear(); // Giả định tất cả cùng năm
-    const balance = await LeaveBalance.getByUserAndYear(leaveRequest.user_id, year);
-    if (!balance) {
-      return res.status(500).json({ success: false, message: 'Leave balance not found for user' });
-    }
-    await balance.addUsedDays(approved_days.length);
-
-    res.status(200).json({
-      success: true,
-      message: 'Leave request approved successfully',
-      data: leaveRequest.toJSON()
-    });
-  } catch (error) {
-    console.error('Error approving leave request:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Internal server error'
-    });
-  }
-};
-
-/**
  * Reject leave request
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object

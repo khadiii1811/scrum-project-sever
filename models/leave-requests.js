@@ -256,24 +256,26 @@ class LeaveRequest {
 
   /**
    * Approve leave request
-   * @param {Date[]} approved_days - Array of approved days
    * @returns {Promise<LeaveRequest>} Updated LeaveRequest instance
    * @throws {Error} If database operation fails
    */
-  async approve(approved_days) {
+  async approve() {
     try {
       if (!this.id) {
         throw new Error('Cannot approve leave request without ID');
       }
-      if (!approved_days || !Array.isArray(approved_days)) {
-        throw new Error('Valid approved days array is required');
-      }
+      // Lấy ngày hiện tại (UTC, chỉ lấy phần ngày)
+      const today = new Date();
+      const yyyy = today.getUTCFullYear();
+      const mm = String(today.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(today.getUTCDate()).padStart(2, '0');
+      const approvedDay = `${yyyy}-${mm}-${dd}`;
 
       const [updated] = await db('leave_requests')
         .where({ id: this.id })
         .update({ 
           status: 'approved', 
-          approved_days,
+          approved_days: [approvedDay],
           reject_reason: null // Clear reject reason when approving
         })
         .returning('*');
@@ -423,22 +425,6 @@ class LeaveRequest {
    */
   static async deleteByUserId(user_id) {
     return db('leave_requests').where({ user_id }).del();
-  }
-
-  async incrementUsedDays(days) {
-    if (!this.id || typeof days !== 'number') {
-      throw new Error('Invalid input for incrementing used days');
-    }
-
-    const updated = await db('leave_balances')
-      .where({ id: this.id })
-      .update({
-        used_days: this.used_days + days
-      })
-      .returning('*');
-
-    Object.assign(this, updated[0]);
-    return this;
   }
 }
 

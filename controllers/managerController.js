@@ -14,7 +14,6 @@ export const getAllEmployeesLeaveRequests = async (req, res) => {
     // Lấy thông tin user
     const User = (await import('../models/user.js')).default;
     const users = await Promise.all(userIds.map(id => User.getById(id)));
-    // Map user_id -> user
     const userMap = {};
     users.forEach(u => { if (u) userMap[u.user_id] = u; });
     // Gắn thông tin user vào từng request
@@ -40,15 +39,44 @@ export const getAllEmployeesLeaveRequests = async (req, res) => {
   }
 };
 
+/**
+ * Approve leave request
+ * @route PUT /manager/leave-requests/:id/approve
+ * @access Private (manager)
+ */
+export const approveLeaveRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const leaveRequest = await LeaveRequest.getById(parseInt(id));
+    if (!leaveRequest) {
+      return res.status(404).json({
+        success: false,
+        message: 'Leave request not found'
+      });
+    }
+    await leaveRequest.approve();
+    res.status(200).json({
+      success: true,
+      message: 'Leave request approved successfully',
+      data: leaveRequest.toJSON()
+    });
+  } catch (error) {
+    console.error('Error approving leave request:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Internal server error'
+    });
+  }
+};
+
 export const rejectLeaveRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
-
-    if (!reason || reason.trim() === '') {
+    if (!reason) {
       return res.status(400).json({
         success: false,
-        message: 'Rejection reason is required',
+        message: 'Reject reason is required',
       });
     }
 
@@ -60,19 +88,12 @@ export const rejectLeaveRequest = async (req, res) => {
       });
     }
 
-    if (leaveRequest.status !== 'pending') {
-      return res.status(400).json({
-        success: false,
-        message: 'Leave request is not pending',
-      });
-    }
-
     await leaveRequest.reject(reason);
 
     res.status(200).json({
       success: true,
       message: 'Leave request rejected successfully',
-      data: leaveRequest.toJSON(),
+      data: leaveRequest.toJSON()
     });
   } catch (error) {
     console.error('Error rejecting leave request:', error);

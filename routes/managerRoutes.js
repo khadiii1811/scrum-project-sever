@@ -1,14 +1,13 @@
 import express from 'express';
 import { authenticate, requireManager } from '../middlewares/auth.js';
-import { getAllEmployeesLeaveRequests } from '../controllers/managerController.js';
+import {
+  getAllEmployeesLeaveRequests,
+  approveLeaveRequest,
+  rejectLeaveRequest,
+} from '../controllers/managerController.js';
 
 const router = express.Router();
 
-/**
- * @route GET /manager/employees-leave-requests
- * @desc Get all employees' leave requests with user info (manager only)
- * @access Private (manager)
- */
 router.get(
   '/employees-leave-requests',
   authenticate,
@@ -17,9 +16,17 @@ router.get(
 );
 
 router.put(
-  '/reject-leave-request/:id',
+  '/leave-requests/:id/approve',
   authenticate,
   requireManager,
+  approveLeaveRequest
+);
+
+router.put(
+  '/leave-requests/:id/reject',
+  authenticate,
+  requireManager, // ✅ Đúng middleware
   rejectLeaveRequest
 );
-export default router; 
+
+export default router;

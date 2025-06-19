@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { CalendarDays, FileText, Clock, BadgeCheck } from "lucide-react";
-import { getAllEmployeesLeaveRequests } from "./axios/manager";
+import RejectModal from "../../components/RejectModal";
+import ConfirmModal from "../../components/ConfirmModal";
+import { getAllEmployeesLeaveRequests, approveLeaveRequest } from "../../axios/manager";
+import { rejectLeaveRequest } from "../../axios/manager";
 
 export default function ListRequest() {
   const [employees, setEmployees] = useState([]);
   const [filterStatus, setFilterStatus] = useState("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  // const [selectedRequestId, setSelectedRequestId] = useState(null);
 
   useEffect(() => {
     getAllEmployeesLeaveRequests()
@@ -22,7 +28,7 @@ export default function ListRequest() {
           leaveDays: item.leave_dates,
           reason: item.reason,
           requestDate: item.created_at ? item.created_at.slice(0, 10) : "",
-          approvedDate: item.updated_at ? item.updated_at.slice(0, 10) : undefined,
+          approvedDate: item.approved_days && item.approved_days.length > 0 ? item.approved_days[0] : undefined,
         }));
         setEmployees(employees);
       })
@@ -42,7 +48,7 @@ export default function ListRequest() {
       case "approved":
         return "bg-green-100 text-green-800";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-orange-100 text-orange-800";
       case "rejected":
         return "bg-red-100 text-red-800";
       default:
@@ -55,7 +61,7 @@ export default function ListRequest() {
       case "approved":
         return "bg-green-500";
       case "pending":
-        return "bg-yellow-500";
+        return "bg-orange-500";
       case "rejected":
         return "bg-red-500";
       default:
@@ -63,19 +69,77 @@ export default function ListRequest() {
     }
   };
 
+  
+
+  const confirmReject = async (reason) => {
+    if (!selectedEmployee) return;
+    try {
+      await rejectLeaveRequest(selectedEmployee.id, reason);
+      toast.success("Rejected");
+
+      // Reload lại danh sách
+      const res = await getAllEmployeesLeaveRequests();
+      const employees = res.data.map((item) => ({
+        id: item.id,
+        name: item.user?.name || "N/A",
+        email: item.user?.email || "",
+        status: item.status,
+        avatar: item.user?.avatar || "https://i.pravatar.cc/150?img=1",
+        leaveDays: item.leave_dates,
+        reason: item.reason,
+        requestDate: item.created_at ? item.created_at.slice(0, 10) : "",
+        approvedDate: item.approved_days && item.approved_days.length > 0 ? item.approved_days[0] : undefined,
+      }));
+      setEmployees(employees);
+      setSelectedEmployee(null);
+    } catch (err) {
+      toast.error("Reject failed");
+    }
+  };
+
   const handleFilterClick = (status) => {
     setFilterStatus(status);
     setIsDropdownOpen(false);
   };
-
-  const handleApprove = () => {
-    toast.success("Approved");
-    setSelectedEmployee(null);
+  const handleConfirmClick = (id) => {
+    setShowConfirmModal(true);
+  } 
+  const handleApprove = async () => {
+    if (!selectedEmployee) return;
+    try {
+      await approveLeaveRequest(selectedEmployee.id);
+      toast.success("Approved");
+      // Reload lại danh sách
+      getAllEmployeesLeaveRequests()
+        .then((res) => {
+          const employees = res.data.map((item) => ({
+            id: item.id,
+            name: item.user?.name || "N/A",
+            email: item.user?.email || "",
+            status: item.status,
+            avatar: item.user?.avatar || "https://i.pravatar.cc/150?img=1",
+            leaveDays: item.leave_dates,
+            reason: item.reason,
+            requestDate: item.created_at ? item.created_at.slice(0, 10) : "",
+            approvedDate: item.approved_days && item.approved_days.length > 0 ? item.approved_days[0] : undefined,
+          }));
+          setEmployees(employees);
+          setSelectedEmployee(null);
+        })
+        .catch(() => {
+          toast.error("Không thể tải lại danh sách sau khi duyệt");
+        });
+    } catch (err) {
+      toast.error("Approve failed");
+    }
   };
-
+  const handleRejectClick = (id, reason) => {
+    setShowRejectModal(true);
+  } 
   const handleReject = () => {
-    toast.error("Rejected");
-    setSelectedEmployee(null);
+    // setSelectedRequestId(requestId);
+    
+    
   };
 
   return (
@@ -192,8 +256,8 @@ export default function ListRequest() {
               </ul>
             </div>
 
-            {/* Approved Date (conditionally rendered) */}
-            {(selectedEmployee.status === "approved" || selectedEmployee.status === "rejected") && selectedEmployee.approvedDate && (
+            {/* Approved Date (only show if approved) */}
+            {selectedEmployee.status === "approved" && selectedEmployee.approvedDate && (
               <div className="bg-green-50 p-4 rounded-xl shadow-sm font-semibold">
                 <div className="flex items-center gap-2 text-green-700">
                   <BadgeCheck size={18} />
@@ -210,20 +274,20 @@ export default function ListRequest() {
               <FileText size={18} />
               <span> REQUEST REASON</span>
             </div>
-            <p className="text-sm text-gray-700 mt-1 ml-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit pariatur odit consequuntur sed ipsa nesciunt ab quo commodi facere! Odio cum voluptates ipsa, doloribus adipisci nesciunt architecto fugiat perspiciatis quod.</p>
+            <p className="text-sm text-gray-700 mt-1 ml-6">{selectedEmployee.reason}</p>
           </div>
 
           {/* Action Buttons */}
           {selectedEmployee.status === "pending" && (
             <div className="flex justify-end gap-2">
               <button
-                onClick={handleReject}
+                onClick={() => handleRejectClick(456)}
                 className="bg-red-100 text-red-700 px-4 py-1.5 rounded-md text-sm font-medium hover:bg-red-200"
               >
                 Reject
               </button>
               <button
-                onClick={handleApprove}
+                onClick={() => handleConfirmClick(selectedEmployee.id)}
                 className="bg-green-100 text-green-700 px-4 py-1.5 rounded-md text-sm font-medium hover:bg-green-200"
               >
                 Approve
@@ -236,11 +300,26 @@ export default function ListRequest() {
                 <FileText size={18} />
                 <span>REJECT REASON</span>
               </div>
-              {/* <p className="text-sm text-gray-700 mt-1 ml-6">{selectedEmployee.rejectReason}</p> */}
-              <p className="text-sm text-gray-700 mt-1 ml-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, non laboriosam delectus officiis dolorum earum quaerat asperiores cupiditate laudantium enim numquam architecto inventore obcaecati voluptatum nostrum? Soluta, voluptas! Exercitationem, repellendus!</p>
+              <p className="text-sm text-gray-700 mt-1 ml-6">{selectedEmployee.rejectReason}</p>
             </div>
           )}
+           <RejectModal
+                show={showRejectModal}
+                onClose={() => setShowRejectModal(false)}
+                onConfirm={confirmReject}
+                title="Reject Request"
+                message="Please confirm rejection and provide a reason:"
+            />
+             <ConfirmModal
+              show={showConfirmModal}
+              onClose={() => setShowConfirmModal(false)}
+              onConfirm={handleApprove}
+              title="Approve Leave Request"
+              message="Are you sure you want to approve this employee's request?"
+            />
+
         </div>
+       
       )}
     </div>
   );
